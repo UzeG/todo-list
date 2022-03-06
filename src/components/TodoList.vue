@@ -218,7 +218,7 @@ export default {
 
 #list .todo-content {
   overflow: auto;
-  min-width: 100px;
+  min-width: 120px;
 }
 
 #list .todo-importance {
