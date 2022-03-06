@@ -9,40 +9,46 @@
 
       <el-main>
         <div id="addIpt">
-          <el-row :gutter="10" justify="center">
-            <el-col :span="2">
+          <el-row :gutter="10" justify="center" align="middle">
+            <el-col :span="1.6">
               <el-button type="primary" @click="dialog.visible = true"
                 >添加新事项</el-button
               >
             </el-col>
           </el-row>
 
-          <el-dialog v-model="dialog.visible" title="Add Todo" width="30%">
+          <el-dialog v-model="dialog.visible" title="添加 Todo" :width="450">
             <div id="todo-form">
               <!-- content -->
               <el-row :gutter="10" align="middle" justify="center">
                 <el-col :span="6" class="form-title">
-                  <span>content:</span>
+                  <span>todo内容:</span>
                 </el-col>
-                <el-col :span="8">
-                  <el-input v-model="dialog.content" placeholder=""></el-input>
+                <el-col :span="10">
+                  <el-input
+                    v-model="dialog.content"
+                    placeholder=""
+                    maxlength="10"
+                    minlength="1"
+                    show-word-limit
+                  ></el-input>
                 </el-col>
               </el-row>
               <!-- importance -->
               <el-row :gutter="10" align="middle" justify="center">
                 <el-col :span="6" class="form-title">
-                  <span>importance:</span>
+                  <span>重要程度:</span>
                 </el-col>
-                <el-col :span="8">
+                <el-col :span="10">
                   <el-rate v-model="dialog.importance"></el-rate>
                 </el-col>
               </el-row>
               <!-- done -->
               <el-row :gutter="10" align="middle" justify="center">
                 <el-col :span="6" class="form-title">
-                  <span>done:</span>
+                  <span>已完成:</span>
                 </el-col>
-                <el-col :span="8">
+                <el-col :span="10">
                   <el-checkbox v-model="dialog.done"></el-checkbox>
                 </el-col>
               </el-row>
@@ -50,8 +56,8 @@
 
             <template #footer>
               <span class="dialog-footer">
-                <el-button @click="dialog.visible = false">Cancel</el-button>
-                <el-button type="primary" @click="addTodo">Confirm</el-button>
+                <el-button @click="dialog.visible = false">取消</el-button>
+                <el-button type="primary" @click="addTodo">确认</el-button>
               </span>
             </template>
           </el-dialog>
@@ -64,25 +70,30 @@
             :key="todo.id"
             justify="center"
           >
-            <el-col :span="1" class="done-checkbox-col">
-              <el-checkbox @change="changeDone(todo.id)" v-model="todo.done"></el-checkbox>
+            <el-col :span="1" class="todo-done">
+              <el-checkbox
+                @change="changeDone(todo.id)"
+                v-model="todo.done"
+              ></el-checkbox>
             </el-col>
-            <el-col :span="3">
+            <el-col :span="3" class="todo-content">
               {{ todo.content }}
             </el-col>
-            <el-col :span="4">
+            <el-col :span="4" class="todo-importance">
               <el-rate v-model="todo.importance" disabled></el-rate>
             </el-col>
             <!-- <el-col :span="1.5">
               <el-button type="success" plain @click="dialog.visible = true">edit</el-button>
             </el-col> -->
-            <el-col :span="1.5" class="delete-button-col">
+            <el-col :span="1.5" class="todo-delete">
               <el-popconfirm
-                title="Are you sure to delete this?"
+                title="确认删除该项？"
                 @confirm="deleteTodo(todo.id)"
+                confirm-button-text="是"
+                cancel-button-text="否"
               >
                 <template #reference>
-                  <el-button type="warning" plain>Delete</el-button>
+                  <el-button type="warning" plain>删除</el-button>
                 </template>
               </el-popconfirm>
             </el-col>
@@ -107,7 +118,7 @@ export default {
       done: false,
     });
 
-    let todos = ref(JSON.parse(localStorage.getItem('todos')) || []);
+    let todos = ref(JSON.parse(localStorage.getItem("todos")) || []);
 
     let deleteTodo = function (id) {
       todos.value = todos.value.filter((todo) => todo.id !== id);
@@ -125,30 +136,30 @@ export default {
 
       initTodoForm();
       dialog.visible = false;
-      
+
       updateLocalTodos();
     };
 
-    let changeDone = function(id) {
+    let changeDone = function (id) {
       updateLocalTodos();
-    }
+    };
 
-    let initTodoForm = function() {
-      dialog.content = '';
+    let initTodoForm = function () {
+      dialog.content = "";
       dialog.importance = 5;
       dialog.done = false;
-    }
+    };
 
     let updateLocalTodos = function () {
-      localStorage.setItem('todos', JSON.stringify(todos.value));
-    }
+      localStorage.setItem("todos", JSON.stringify(todos.value));
+    };
 
     return {
       todos,
       deleteTodo,
       dialog,
       addTodo,
-      changeDone
+      changeDone,
     };
   },
 };
@@ -199,15 +210,28 @@ export default {
   overflow: hidden;
 }
 
-#list .done-checkbox-col {
+/*  */
+#list .todo-done {
   text-align: center;
+  min-width: 40px;
 }
 
-#list .delete-button-col {
-  text-align: center;
+#list .todo-content {
+  overflow: auto;
+  min-width: 100px;
 }
 
-/* #list .delete-button-col button {
+#list .todo-importance {
+  min-width: 150px;
+}
+
+#list .todo-delete {
+  text-align: center;
+  min-width: 80px;
+}
+/*  */
+
+/* #list .todo-delete button {
   display: none;
 }
 
