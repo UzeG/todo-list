@@ -16,51 +16,6 @@
               >
             </el-col>
           </el-row>
-
-          <el-dialog v-model="dialog.visible" title="添加 Todo" :width="400">
-            <div id="todo-form">
-              <!-- content -->
-              <el-row :gutter="10" align="middle" justify="center">
-                <el-col :span="6" class="form-title">
-                  <span>todo内容:</span>
-                </el-col>
-                <el-col :span="10">
-                  <el-input
-                    v-model="dialog.content"
-                    placeholder=""
-                    maxlength="10"
-                    minlength="1"
-                    show-word-limit
-                  ></el-input>
-                </el-col>
-              </el-row>
-              <!-- importance -->
-              <el-row :gutter="10" align="middle" justify="center">
-                <el-col :span="6" class="form-title">
-                  <span>重要程度:</span>
-                </el-col>
-                <el-col :span="10">
-                  <el-rate v-model="dialog.importance"></el-rate>
-                </el-col>
-              </el-row>
-              <!-- done -->
-              <el-row :gutter="10" align="middle" justify="center">
-                <el-col :span="6" class="form-title">
-                  <span>已完成:</span>
-                </el-col>
-                <el-col :span="10">
-                  <el-checkbox v-model="dialog.done"></el-checkbox>
-                </el-col>
-              </el-row>
-            </div>
-
-            <template #footer>
-              <span class="dialog-footer">
-                <el-button @click="dialog.visible = false">取消</el-button>
-                <el-button type="primary" @click="addTodo">确认</el-button>
-              </span>
-            </template>
-          </el-dialog>
         </div>
 
         <div id="list">
@@ -101,6 +56,51 @@
         </div>
       </el-main>
     </el-container>
+
+    <el-dialog v-model="dialog.visible" title="添加 Todo" :width="400">
+      <div id="todo-form">
+        <!-- content -->
+        <el-row :gutter="10" align="middle" justify="center">
+          <el-col :span="6" class="form-title">
+            <span>todo内容:</span>
+          </el-col>
+          <el-col :span="10">
+            <el-input
+              v-model="dialog.content"
+              placeholder=""
+              maxlength="10"
+              minlength="1"
+              show-word-limit
+            ></el-input>
+          </el-col>
+        </el-row>
+        <!-- importance -->
+        <el-row :gutter="10" align="middle" justify="center">
+          <el-col :span="6" class="form-title">
+            <span>重要程度:</span>
+          </el-col>
+          <el-col :span="10">
+            <el-rate v-model="dialog.importance"></el-rate>
+          </el-col>
+        </el-row>
+        <!-- done -->
+        <el-row :gutter="10" align="middle" justify="center">
+          <el-col :span="6" class="form-title">
+            <span>已完成:</span>
+          </el-col>
+          <el-col :span="10">
+            <el-checkbox v-model="dialog.done"></el-checkbox>
+          </el-col>
+        </el-row>
+      </div>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialog.visible = false">取消</el-button>
+          <el-button type="primary" @click="addTodo">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -161,6 +161,11 @@ export default {
       addTodo,
       changeDone,
     };
+  },
+
+  mounted() {
+    console.log(this.$bus);
+    this.$bus.on('addTodo', this.addTodo);
   },
 };
 </script>
@@ -243,7 +248,6 @@ export default {
 
 #list .todo-delete button {
 }
-
 
 /* <----- DIALOG -----> */
 #addIpt .el-row:nth-child(1) {
