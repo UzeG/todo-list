@@ -17,7 +17,7 @@
             </el-col>
           </el-row>
 
-          <el-dialog v-model="dialog.visible" title="添加 Todo" :width="450">
+          <el-dialog v-model="dialog.visible" title="添加 Todo" :width="400">
             <div id="todo-form">
               <!-- content -->
               <el-row :gutter="10" align="middle" justify="center">
@@ -201,6 +201,13 @@ export default {
   background-color: aliceblue;
 }
 
+#list .el-row .el-col:nth-child(1) {
+  border-radius: 10px 0px 0px 10px;
+}
+#list .el-row .el-col:last-child {
+  border-radius: 0px 10px 10px 0px;
+}
+
 #list .el-row:not(:last-child) {
   margin-bottom: calc(var(--todo-height) * 0.4px);
 }
@@ -218,11 +225,14 @@ export default {
 
 #list .todo-content {
   overflow: auto;
-  min-width: 120px;
+  min-width: 100px;
+  font-size: 14px;
+  color: #555;
+  text-shadow: #555 0px 0px 0px;
 }
 
 #list .todo-importance {
-  min-width: 150px;
+  min-width: 130px;
 }
 
 #list .todo-delete {
@@ -231,13 +241,9 @@ export default {
 }
 /*  */
 
-/* #list .todo-delete button {
-  display: none;
+#list .todo-delete button {
 }
 
-#list .el-row:hover button {
-  display: inline;
-} */
 
 /* <----- DIALOG -----> */
 #addIpt .el-row:nth-child(1) {
