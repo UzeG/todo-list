@@ -11,7 +11,7 @@
         <div id="addIpt">
           <el-row :gutter="10" justify="center" align="middle">
             <el-col :span="1.6">
-              <el-button type="primary" @click="dialog.visible = true"
+              <el-button type="primary" @click="addBtn"
                 >添加新事项</el-button
               >
             </el-col>
@@ -37,9 +37,11 @@
             <el-col :span="4" class="todo-importance">
               <el-rate v-model="todo.importance" disabled></el-rate>
             </el-col>
-            <!-- <el-col :span="1.5">
-              <el-button type="success" plain @click="dialog.visible = true">edit</el-button>
-            </el-col> -->
+            <el-col :span="1.5">
+              <el-button type="success" plain @click="editBtn(todo)"
+                >edit</el-button
+              >
+            </el-col>
             <el-col :span="1.5" class="todo-delete">
               <el-popconfirm
                 title="确认删除该项？"
@@ -57,60 +59,22 @@
       </el-main>
     </el-container>
 
-    <el-dialog v-model="dialog.visible" title="添加 Todo" :width="400">
-      <div id="todo-form">
-        <!-- content -->
-        <el-row :gutter="10" align="middle" justify="center">
-          <el-col :span="6" class="form-title">
-            <span>todo内容:</span>
-          </el-col>
-          <el-col :span="10">
-            <el-input
-              v-model="dialog.content"
-              placeholder=""
-              maxlength="10"
-              minlength="1"
-              show-word-limit
-            ></el-input>
-          </el-col>
-        </el-row>
-        <!-- importance -->
-        <el-row :gutter="10" align="middle" justify="center">
-          <el-col :span="6" class="form-title">
-            <span>重要程度:</span>
-          </el-col>
-          <el-col :span="10">
-            <el-rate v-model="dialog.importance"></el-rate>
-          </el-col>
-        </el-row>
-        <!-- done -->
-        <el-row :gutter="10" align="middle" justify="center">
-          <el-col :span="6" class="form-title">
-            <span>已完成:</span>
-          </el-col>
-          <el-col :span="10">
-            <el-checkbox v-model="dialog.done"></el-checkbox>
-          </el-col>
-        </el-row>
-      </div>
-
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialog.visible = false">取消</el-button>
-          <el-button type="primary" @click="addTodo">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <!-- 表单对话框 -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import { reactive, ref } from "vue";
+import { inject } from "vue";
 import { nanoid } from "nanoid";
+import router from "../router";
 
 export default {
   name: "TodoList",
   setup(props, context) {
+    const emitter = inject("emitter");
+
     let dialog = reactive({
       visible: false,
       content: "",
@@ -120,52 +84,78 @@ export default {
 
     let todos = ref(JSON.parse(localStorage.getItem("todos")) || []);
 
+    // 删除
     let deleteTodo = function (id) {
       todos.value = todos.value.filter((todo) => todo.id !== id);
 
       updateLocalTodos();
     };
 
-    let addTodo = function () {
-      todos.value.push({
-        id: nanoid(),
-        content: dialog.content,
-        importance: dialog.importance,
-        done: dialog.done,
-      });
+    // 添加
+    let addTodo = function (targetTodo) {
+      todos.value.push({id: nanoid(), ...targetTodo});
 
-      initTodoForm();
       dialog.visible = false;
 
       updateLocalTodos();
     };
+    emitter.on("addTodo", addTodo);
 
+    // 编辑
+    let editTodo = function (targetTodo) {
+      // 更新todos
+      for (const index in todos.value) {
+        if (todos.value[index].id == targetTodo.id) {
+          todos.value[index] = targetTodo;
+          break;
+        }
+      }
+      // 更新本地存储
+      updateLocalTodos();
+    };
+    emitter.on("editTodo", editTodo);
+
+    // 改变完成状态
     let changeDone = function (id) {
       updateLocalTodos();
     };
 
+    // 清空表单数据
     let initTodoForm = function () {
       dialog.content = "";
       dialog.importance = 5;
       dialog.done = false;
     };
 
+    // 更新本地存储
     let updateLocalTodos = function () {
       localStorage.setItem("todos", JSON.stringify(todos.value));
+    };
+
+    // 添加按钮回调
+    let addBtn = function () {
+      router.push({
+        name: "add",
+      });
+    };
+    // 编辑按钮回调
+    let editBtn = function (targetTodo) {
+      router.push({
+        name: "edit",
+        params: {
+          id: targetTodo.id,
+        },
+      });
     };
 
     return {
       todos,
       deleteTodo,
       dialog,
-      addTodo,
       changeDone,
+      addBtn,
+      editBtn,
     };
-  },
-
-  mounted() {
-    console.log(this.$bus);
-    this.$bus.on('addTodo', this.addTodo);
   },
 };
 </script>

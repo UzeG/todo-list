@@ -1,5 +1,10 @@
 <template>
-  <el-dialog v-model="dlgVisible" title="Add Todo" :width="400">
+  <el-dialog
+    v-model="dlgVisible"
+    title="Add Todo"
+    :width="450"
+    @closed="compileInterruptFn"
+  >
     <div id="todo-form">
       <!-- content -->
       <el-row :gutter="10" align="middle" justify="center">
@@ -7,7 +12,12 @@
           <span>content:</span>
         </el-col>
         <el-col :span="8">
-          <el-input v-model="todoForm.content" placeholder=""></el-input>
+          <el-input
+            v-model="todoForm.content"
+            maxlength="10"
+            minlength="1"
+            placeholder=""
+          ></el-input>
         </el-col>
       </el-row>
       <!-- importance -->
@@ -32,8 +42,8 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="changeDlgState(false)">Cancel</el-button>
-        <el-button type="primary" @click="addTodo">Confirm</el-button>
+        <el-button @click="compileInterruptFn">Cancel</el-button>
+        <el-button type="primary" @click="compileFinFn">Confirm</el-button>
       </span>
     </template>
   </el-dialog>
@@ -41,28 +51,70 @@
 
 <script>
 import { reactive, ref } from "vue";
+import { inject } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   name: "Dialog",
   setup(props, context) {
-    let dlgVisible = ref(false);
+    const emitter = inject("emitter");
+
+    const router = useRouter();
+    const route = useRoute();
+
+    let dlgVisible = ref(true);
+
+    let currentTodoId = ref("");
     let todoForm = reactive({
       content: "",
       importance: 5,
       done: false,
     });
 
-    let changeDlgState = function(boolVal) {
-      dlgVisible.value = boolVal;
-    }
+    // 完成编辑
+    let compileFinFn = function () {
+      if (currentTodoId.value) {
+        let editedTodo = { id: currentTodoId.value, ...todoForm };
+
+        emitter.emit("editTodo", editedTodo);
+      } else {
+        let addedTodo = { ...todoForm };
+        emitter.emit("addTodo", addedTodo);
+      }
+
+      router.replace({
+        name: "index",
+      });
+    };
+
+    // 中断/取消编辑
+    let compileInterruptFn = function () {
+      router.replace({
+        name: "index",
+      });
+    };
 
     return {
+      dlgVisible,
       todoForm,
-      changeDlgState
+      currentTodoId,
+      compileFinFn,
+      compileInterruptFn,
+      router,
+      route,
     };
   },
   mounted() {
-    this.$bus.on('changeDlgState', changeDlgState);
+    if (this.route.name == "edit") {
+      this.currentTodoId = this.route.params.id;
+      JSON.parse(localStorage.getItem("todos")).forEach((todo) => {
+        if (todo.id == this.currentTodoId) {
+          this.todoForm.content = todo.content;
+          this.todoForm.importance = todo.importance;
+          this.todoForm.done = todo.done;
+        }
+      });
+    }
   },
 };
 </script>

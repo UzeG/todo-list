@@ -9,13 +9,18 @@ const routes = [
         name: 'index',
         path: '/index',
         component: () => import('../components/TodoList.vue'),
-        // children: [
-        //     {
-        //         name: 'edit',
-        //         path: 'edit',
-        //         component: () => import('../components/Dialog.vue')
-        //     }
-        // ]
+        children: [
+            {
+                name: 'edit',
+                path: 'edit/:id',
+                component: () => import('../components/Dialog.vue')
+            },
+            {
+                name: 'add',
+                path: 'add',
+                component: () => import('../components/Dialog.vue')
+            }
+        ]
     },
 ]
 
