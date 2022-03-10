@@ -39,7 +39,7 @@
             </el-col>
             <el-col :span="1.5">
               <el-button type="success" plain @click="editBtn(todo)"
-                >edit</el-button
+                >编辑</el-button
               >
             </el-col>
             <el-col :span="1.5" class="todo-delete">

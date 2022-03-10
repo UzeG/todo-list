@@ -7,3 +7,9 @@ export default {
   name: 'App',
 }
 </script>
+
+<style>
+  body {
+    /* min-width: 480px; */
+  }
+</style>

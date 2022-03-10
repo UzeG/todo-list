@@ -2,28 +2,29 @@
   <el-dialog
     v-model="dlgVisible"
     title="Add Todo"
-    :width="450"
+    :width="dlgWidth"
     @closed="compileInterruptFn"
   >
     <div id="todo-form">
       <!-- content -->
       <el-row :gutter="10" align="middle" justify="center">
-        <el-col :span="6" class="form-title">
-          <span>content:</span>
+        <el-col :span="8" class="form-title">
+          <span>内容:</span>
         </el-col>
         <el-col :span="8">
           <el-input
             v-model="todoForm.content"
             maxlength="10"
             minlength="1"
+            show-word-limit
             placeholder=""
           ></el-input>
         </el-col>
       </el-row>
       <!-- importance -->
       <el-row :gutter="10" align="middle" justify="center">
-        <el-col :span="6" class="form-title">
-          <span>importance:</span>
+        <el-col :span="8" class="form-title">
+          <span>重要程度:</span>
         </el-col>
         <el-col :span="8">
           <el-rate v-model="todoForm.importance"></el-rate>
@@ -31,8 +32,8 @@
       </el-row>
       <!-- done -->
       <el-row :gutter="10" align="middle" justify="center">
-        <el-col :span="6" class="form-title">
-          <span>done:</span>
+        <el-col :span="8" class="form-title">
+          <span>完成:</span>
         </el-col>
         <el-col :span="8">
           <el-checkbox v-model="todoForm.done"></el-checkbox>
@@ -42,15 +43,15 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="compileInterruptFn">Cancel</el-button>
-        <el-button type="primary" @click="compileFinFn">Confirm</el-button>
+        <el-button @click="compileInterruptFn">关闭</el-button>
+        <el-button type="primary" @click="compileFinFn">确认</el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script>
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -63,6 +64,17 @@ export default {
     const route = useRoute();
 
     let dlgVisible = ref(true);
+    let dlgWidth = computed(() => {
+      if (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        )
+      ) {  // 移动
+        return "90%"
+      } else {  // PC
+        return 450;
+      }
+    });
 
     let currentTodoId = ref("");
     let todoForm = reactive({
@@ -95,6 +107,7 @@ export default {
     };
 
     return {
+      dlgWidth,
       dlgVisible,
       todoForm,
       currentTodoId,
